@@ -13,7 +13,7 @@ class NewVisitorTest(LiveServerTestCase):
 
     def tearDown(self):
         self.browser.quit()
-
+    
     def wait_for_row_in_list_table(self, row_text):
         start_time = time.time()
         while True:
@@ -26,6 +26,31 @@ class NewVisitorTest(LiveServerTestCase):
                 if time.time() - start_time > MAX_WAIT:
                     raise e
                 time.sleep(0.1)
+
+    def test_layout_and_styling(self):
+        # Edith goes to the home page
+        self.browser.get(self.live_server_url)
+        self.browser.set_window_size(1024, 768)
+
+        # She notices the input box is nicely centered
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        self.assertAlmostEqual(
+            inputbox.location['x'] + inputbox.size['width'] / 2,
+            505,
+            delta=5
+        )
+
+        # She starts a new list and sees the input is nicely
+        # centered there too
+        inputbox.send_keys('testing')
+        inputbox.send_keys(Keys.ENTER)
+        self.wait_for_row_in_list_table('1: testing')
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        self.assertAlmostEqual(
+            inputbox.location['x'] + inputbox.size['width'] / 2,
+            505,
+            delta=5
+        )
 
     def test_can_start_a_list_and_retrive_it_later(self):
 
